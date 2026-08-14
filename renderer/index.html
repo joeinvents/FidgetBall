@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'self'" />
+    <title>Fidgetball</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: transparent;
+        cursor: default;
+        user-select: none;
+      }
+      canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      body.hovering {
+        cursor: grab;
+      }
+      body.dragging {
+        cursor: grabbing;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="stage"></canvas>
+    <script src="renderer.js"></script>
+  </body>
+</html>

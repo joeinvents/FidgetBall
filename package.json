@@ -1,0 +1,86 @@
+{
+  "name": "fidgetball",
+  "version": "1.0.0",
+  "description": "A ball on a string that hangs from the top of your screen so you have something to do while the AI thinks.",
+  "main": "main.js",
+  "bin": {
+    "fidgetball": "bin/cli.js"
+  },
+  "files": [
+    "main.js",
+    "preload.js",
+    "renderer/",
+    "bin/"
+  ],
+  "keywords": [
+    "overlay",
+    "tray",
+    "electron",
+    "fidget",
+    "toy",
+    "pendulum",
+    "desktop-pet"
+  ],
+  "author": "joeinvents",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joeinvents/FidgetBall.git"
+  },
+  "homepage": "https://github.com/joeinvents/FidgetBall#readme",
+  "bugs": {
+    "url": "https://github.com/joeinvents/FidgetBall/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win --publish never",
+    "release:patch": "npm version patch && npm publish && git push --follow-tags",
+    "release:minor": "npm version minor && npm publish && git push --follow-tags"
+  },
+  "build": {
+    "appId": "com.joeinvents.fidgetball",
+    "productName": "Fidgetball",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "${productName}-Setup-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}-portable.${ext}"
+    }
+  },
+  "dependencies": {
+    "electron": "^43.4.0"
+  },
+  "devDependencies": {
+    "electron-builder": "^26.15.3"
+  }
+}

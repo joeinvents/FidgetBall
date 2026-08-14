@@ -1,0 +1,129 @@
+# Fidgetball
+
+> Your prompt is running. Your brain is not. Here is a ball.
+
+Sometimes Claude is thinking for four minutes straight and you must do something with your hands, or
+you will alt-tab to Twitter and lose the next hour of your life.
+
+Fidgetball hangs a ball on an elastic string from the top of your screen. It floats over everything,
+ignores your clicks (except on the ball), and swings. That's it. That's the app.
+
+## Install + run
+
+```bash
+npm install -g fidgetball
+fidgetball
+```
+
+Or don't commit to anything:
+
+```bash
+npx fidgetball
+```
+
+Either way the first run pulls a couple hundred MB of Electron down, so maybe not on hotel wifi.
+
+Prefer not to have Node involved at all? Grab `Fidgetball-Setup-<version>.exe` (installer) or
+`Fidgetball-<version>-portable.exe` (no install, just run it) from the
+[latest release](https://github.com/joeinvents/FidgetBall/releases/latest). Unsigned, so SmartScreen
+will make you click "more info → run anyway" once.
+
+Windows tested. macOS and Linux should work — Electron says so, and Electron has never lied to me.
+
+## Controls
+
+- **Grab the ball and fling it.** It has weight. It has momentum. It has more personality than most
+  standup meetings.
+- **Scroll on the ball** — longer or shorter string.
+- **Click the tray icon** — hide/show the ball when your manager walks past.
+- **Right-click the tray icon** — reset, swing, string length, quit.
+- **Everything else still works.** The overlay only takes your mouse within 54 pixels of the ball.
+  Click straight through it the rest of the time.
+
+## Tuning
+
+Constants at the top of [`renderer/renderer.js`](renderer/renderer.js):
+
+| Constant | What it does |
+| --- | --- |
+| `BALL_RADIUS` | Bigger ball |
+| `GRAVITY` | Lower = moon ball |
+| `COMPLIANCE` | Higher = stretchier |
+| `ROPE_DAMPING` | Lower = swings forever |
+| `BALL_INV_MASS` | Lower = heavier, saggier |
+| `BOUNCE` | Bounciness off the screen edges |
+| `MAX_SPEED` | Speed limit (it is there for a reason) |
+
+## Roadmap
+
+- [x] Ball
+- [x] String
+- [x] String that stretches
+
+## Run from source
+
+```bash
+git clone https://github.com/joeinvents/FidgetBall.git
+cd fidgetball
+npm install
+npm start
+```
+
+Node.js 18+.
+
+## Publishing (for me, in three months, having forgotten all of this)
+
+Two ways this reaches a human: npm, or a prebuilt binary. Only the first one is actually wired up.
+
+### npm — works today
+
+```bash
+npm login                # once per machine; 2FA will want an OTP
+npm pack --dry-run       # look at what's shipping before you ship it
+npm run release:patch    # version bump + publish + push tags
+```
+
+`npm run release:minor` exists too. Both scripts end in `git push --follow-tags`, so the repo needs
+a remote configured or they fail *after* publishing — which is the worst place to fail, because the
+version is now burned on the registry forever and you get to bump again.
+
+Only the files in the `files` field ship, so `node_modules` and your shame stay local.
+
+Electron is a real `dependency`, not a devDependency. That's the whole trick that makes
+`npm install -g fidgetball` produce a working app instead of a crash. The tradeoff: the first
+install pulls a couple hundred MB of Electron down before anything happens. Worth knowing before
+you tell someone to `npx` it on conference wifi.
+
+### Prebuilt binaries — GitHub Actions
+
+Push a version tag and [`.github/workflows/release.yml`](.github/workflows/release.yml) builds on
+`windows-latest`, then attaches the installers to a GitHub Release:
+
+```bash
+npm version patch          # creates the v1.0.1 tag
+git push --follow-tags     # tag push is what triggers the workflow
+```
+
+Two artifacts come out, both x64, both about 95 MB because Electron is Electron:
+
+| File | What it is |
+| --- | --- |
+| `Fidgetball-Setup-<version>.exe` | NSIS installer, lets you pick the install directory |
+| `Fidgetball-<version>-portable.exe` | Run it from anywhere, installs nothing |
+
+You can also trigger it by hand from the Actions tab (`workflow_dispatch`) — that skips the Release
+step and just leaves the artifacts on the run for 30 days.
+
+To build locally instead, `npm run dist` drops the same files in `dist/`. **It will fail on a clean
+checkout**, and this is not a bug: electron-builder v26 refuses to run while `electron` sits in
+`dependencies`, but it has to live there or `npx fidgetball` has no Electron to launch. The
+workflow resolves this by moving it to `devDependencies` in the CI checkout right before packaging.
+If you want to build locally, do the same swap, build, then put it back — do not commit the swapped
+version or you'll ship a broken npm package.
+
+No code signing, so Windows SmartScreen will call it untrusted and users get the "more info → run
+anyway" dance. Fixing that costs an actual certificate.
+
+## License
+
+MIT. It's a ball on a string.
