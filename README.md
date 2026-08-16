@@ -73,36 +73,42 @@ Node.js 18+.
 
 ## Publishing (for me, in three months, having forgotten all of this)
 
-Two ways this reaches a human: npm, or a prebuilt binary. Only the first one is actually wired up.
-
-### npm — works today
+Two ways this reaches a human: npm, or a prebuilt binary. Both are wired up as GitHub Actions that
+fire on the same trigger — push a version tag:
 
 ```bash
-npm login                # once per machine; 2FA will want an OTP
-npm pack --dry-run       # look at what's shipping before you ship it
-npm run release:patch    # version bump + publish + push tags
+npm version patch          # bumps package.json, creates the v1.0.1 commit + tag
+git push --follow-tags     # tag push is what triggers both workflows
 ```
 
-`npm run release:minor` exists too. Both scripts end in `git push --follow-tags`, so the repo needs
-a remote configured or they fail *after* publishing — which is the worst place to fail, because the
-version is now burned on the registry forever and you get to bump again.
+### npm — [`.github/workflows/npm-publish.yml`](.github/workflows/npm-publish.yml)
 
-Only the files in the `files` field ship, so `node_modules` and your shame stay local.
+Runs on `ubuntu-latest`, does `npm ci` then `npm publish`, authenticated with the `NPM_TOKEN` repo
+secret (an npm **Automation** token — bypasses the 2FA/OTP prompt a normal publish would need).
+
+One-time setup on a new machine/repo:
+
+```bash
+# 1. Create an Automation token at https://www.npmjs.com/settings/<you>/tokens
+# 2. Add it as a repo secret (prompts for the value, keeps it out of shell history):
+gh secret set NPM_TOKEN --repo joeinvents/FidgetBall
+```
+
+Only the files in the `files` field ship, so `node_modules` and your shame stay local. `npm pack
+--dry-run` shows what would ship without publishing anything.
 
 Electron is a real `dependency`, not a devDependency. That's the whole trick that makes
 `npm install -g fidgetball` produce a working app instead of a crash. The tradeoff: the first
 install pulls a couple hundred MB of Electron down before anything happens. Worth knowing before
 you tell someone to `npx` it on conference wifi.
 
-### Prebuilt binaries — GitHub Actions
+Prefer to publish by hand instead of via CI? `npm login` (once per machine; 2FA wants an OTP), then
+`npm run release:patch` / `npm run release:minor` — same version-bump-and-tag dance, done locally,
+which also triggers the CI workflows on push.
 
-Push a version tag and [`.github/workflows/release.yml`](.github/workflows/release.yml) builds on
-`windows-latest`, then attaches the installers to a GitHub Release:
+### Prebuilt binaries — [`.github/workflows/release.yml`](.github/workflows/release.yml)
 
-```bash
-npm version patch          # creates the v1.0.1 tag
-git push --follow-tags     # tag push is what triggers the workflow
-```
+Builds on `windows-latest`, then attaches the installers to a GitHub Release:
 
 Two artifacts come out, both x64, both about 95 MB because Electron is Electron:
 
@@ -111,8 +117,9 @@ Two artifacts come out, both x64, both about 95 MB because Electron is Electron:
 | `Fidgetball-Setup-<version>.exe` | NSIS installer, lets you pick the install directory |
 | `Fidgetball-<version>-portable.exe` | Run it from anywhere, installs nothing |
 
-You can also trigger it by hand from the Actions tab (`workflow_dispatch`) — that skips the Release
-step and just leaves the artifacts on the run for 30 days.
+You can also trigger it (or the npm publish) by hand from the Actions tab (`workflow_dispatch`) — a
+manual run of `release.yml` skips the GitHub Release step and just leaves the artifacts on the run
+for 30 days.
 
 To build locally instead, `npm run dist` drops the same files in `dist/`. **It will fail on a clean
 checkout**, and this is not a bug: electron-builder v26 refuses to run while `electron` sits in
