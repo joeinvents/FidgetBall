@@ -1,6 +1,6 @@
 {
   "name": "fidgetball",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A ball on a string that hangs from the top of your screen so you have something to do while the AI thinks.",
   "main": "main.js",
   "bin": {

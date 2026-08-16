@@ -10,27 +10,33 @@ ignores your clicks (except on the ball), and swings. That's it. That's the app.
 
 ## Install + run
 
+**[⬇ Download here](https://github.com/joeinvents/FidgetBall/releases/latest)** — grab the `.exe`,
+run it, you have a ball. Windows will nag with a SmartScreen popup since it's unsigned; click "more
+info → run anyway" and move on.
+
+- `Fidgetball-Setup-<version>.exe` — installer, adds it to your Start menu.
+- `Fidgetball-<version>-portable.exe` — no install, just double-click and go.
+
+Windows tested. macOS and Linux "should work (tm)".
+
+<details>
+<summary>Prefer npm?</summary>
+
 ```bash
 npm install -g fidgetball
 fidgetball
 ```
 
-Or don't commit to anything:
+or without installing anything permanently:
 
 ```bash
 npx fidgetball
 ```
 
-Either way the first run pulls a couple hundred MB of Electron down, so maybe not on hotel wifi.
-Needs Node.js 22.12+ — anything older and Electron's own installer crashes trying to `require()` one
-of its now-ESM-only dependencies.
+Needs Node.js 22.12+, and the first run pulls a couple hundred MB of Electron down — so not on
+hotel wifi, and not on an older Node (Electron's own installer will crash on one).
 
-Prefer not to have Node involved at all? Grab `Fidgetball-Setup-<version>.exe` (installer) or
-`Fidgetball-<version>-portable.exe` (no install, just run it) from the
-[latest release](https://github.com/joeinvents/FidgetBall/releases/latest). Unsigned, so SmartScreen
-will make you click "more info → run anyway" once.
-
-Windows tested. macOS and Linux should work — Electron says so, and Electron has never lied to me.
+</details>
 
 ## Controls
 
