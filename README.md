@@ -22,6 +22,8 @@ npx fidgetball
 ```
 
 Either way the first run pulls a couple hundred MB of Electron down, so maybe not on hotel wifi.
+Needs Node.js 22.12+ — anything older and Electron's own installer crashes trying to `require()` one
+of its now-ESM-only dependencies.
 
 Prefer not to have Node involved at all? Grab `Fidgetball-Setup-<version>.exe` (installer) or
 `Fidgetball-<version>-portable.exe` (no install, just run it) from the
@@ -69,7 +71,8 @@ npm install
 npm start
 ```
 
-Node.js 18+.
+Node.js 22.12+. Electron's installer script needs a Node new enough to `require()` an ESM
+dependency without choking (see the pinned `@noble/hashes` note below for the same class of bug).
 
 ## Publishing (for me, in three months, having forgotten all of this)
 
